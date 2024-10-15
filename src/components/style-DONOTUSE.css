@@ -12,8 +12,8 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 400px;
-  height: 400px;
+  width: 380px;
+  height: 380px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -25,4 +25,48 @@
   color: white;
   font-size: 14px;
   text-align: center;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 1000px) {
+  .overlay-circle {
+    width: 300px;
+    height: 300px;
+  }
+
+  .overlay-text {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .overlay-circle {
+    width: 250px;
+    height: 250px;
+  }
+
+  .overlay-text {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 375px) {
+  .overlay-circle {
+    width: 220px;
+    height: 220px;
+  }
+
+  .overlay-text {
+    font-size: 10px;
+  }
+}
+@media (max-width: 320px) {
+  .overlay-circle {
+    width: 190px;
+    height: 190px;
+  }
+
+  .overlay-text {
+    font-size: 10px;
+  }
 }
