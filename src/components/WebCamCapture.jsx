@@ -237,7 +237,7 @@ const WebCamCapture = () => {
               />
             </div>
           )}
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative', marginTop: '20px' }}>
             <video
               ref={webcamRef}
               autoPlay
@@ -247,7 +247,7 @@ const WebCamCapture = () => {
             {/* Overlay circle with green border */}
             <div className="overlay-circle" style={{ 
               border: `5px solid ${tagDisabled ? "green" : "red"}`,
-              backgroundColor: tagDisabled ? "rgba(0, 0, 0, 0)" : "rgba(255, 0, 0, 0.5)"
+              backgroundColor: tagDisabled ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.2)"
             }}>
               {tagDisabled ? "" : <div className='overlay-text'>Move closer until the object fits within the circle</div>}
             </div>
