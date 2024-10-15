@@ -237,13 +237,21 @@ const WebCamCapture = () => {
               />
             </div>
           )}
-          <video
-            ref={webcamRef}
-            className="mt-3"
-            autoPlay
-            playsInline
-            style={{ width: "100%", maxHeight: "400px" }}
-          />
+          <div style={{ position: 'relative' }}>
+            <video
+              ref={webcamRef}
+              autoPlay
+              playsInline
+              style={{ width: '100%', maxHeight: '400px'}}
+            />
+            {/* Overlay circle with green border */}
+            <div className="overlay-circle" style={{ 
+              border: `5px solid ${tagDisabled ? "green" : "red"}`,
+              backgroundColor: tagDisabled ? "rgba(0, 0, 0, 0)" : "rgba(255, 0, 0, 0.5)"
+            }}>
+              {tagDisabled ? "" : <div className='overlay-text'>Move closer until the object fits within the circle</div>}
+            </div>
+          </div>
         </Modal.Body>
       </Modal>
 
