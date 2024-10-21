@@ -14,12 +14,9 @@ const WebCamCapture = () => {
   const mediaRecorderRef = useRef(null);
   const [tagValue, setTagValue] = useState("");
   const [tagDisabled, setTagDisabled] = useState(false);
-
   const [errorMessage, setErrorMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false); // for error modal
-  const [capturedImage, setCapturedImage] = useState(null);
-  const [showGetWheelID, setShowGetWheelID] = useState(false);
 
   const tagChange = (event) => {
     setTagValue(event.target.value);
@@ -31,73 +28,21 @@ const WebCamCapture = () => {
 
   const uploadVideo = async () => {
     setTagDisabled(false);
-
     const videoBlob = new Blob(recordedChunks, { type: "video/webm" });
     const formData = new FormData();
     formData.append("video", videoBlob, "recorded-video.webm");
     formData.append("tagValue", tagValue);
     try {
-      const response = await axios.post("/api/v2/train",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log(response);
-      alert("Video uploaded successfully!");
+      await axios.post("/api/v2/train", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
     } catch (error) {
-      sendErrorToUser(error.response.data.message);
       console.error("Error uploading video:", error);
+      sendErrorToUser("Failed to upload video.");
     }
     setRecordedChunks([]);
-  };
-
-  const capture = () => {
-    const video = webcamRef.current;
-    if (!video) {
-      console.error("Webcam is not available.");
-      return;
-    }
-
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const context = canvas.getContext("2d");
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const capturedImageUrl = canvas.toDataURL("image/png");
-    setCapturedImage(capturedImageUrl);
-  };
-
-  // Upload captured image to backend for prediction
-  const handleCapture = async () => {
-    if (!capturedImage) {
-      console.error("No captured image to upload.");
-      return;
-    }
-
-    const formData = new FormData();
-    const response = await fetch(capturedImage);
-    const blob = await response.blob();
-    formData.append("image", blob, "captured-image.png");
-
-    try {
-      const response = await axios.post("/api/v1/predict",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log(response.data);
-      alert("Image uploaded successfully");
-    } catch (error) {
-      console.error("Error uploading the image:", error);
-      alert("Error uploading the image");
-      setHasError(true);
-    }
   };
 
   const startRecording = () => {
@@ -122,7 +67,6 @@ const WebCamCapture = () => {
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           setRecordedChunks((prev) => [...prev, event.data]);
-
           const videoBlob = new Blob([event.data], { type: "video/webm" });
           const videoURL = URL.createObjectURL(videoBlob);
           setVideoURL(videoURL);
@@ -133,7 +77,7 @@ const WebCamCapture = () => {
       setRecording(true);
       setTimeout(() => {
         stopRecording();
-      }, 10000); // set the limit of recording video: 10000 = 10s
+      }, 10000);  // set the limit of recording video: 10000 = 10s
     } else {
       sendErrorToUser("Webcam reference is not set or stream is invalid.");
     }
@@ -168,7 +112,6 @@ const WebCamCapture = () => {
 
   const handleGetWheelID = () => {
     startWebcam();
-    setShowGetWheelID(true);
   };
 
   const handleTrainWheel = () => {
@@ -181,8 +124,7 @@ const WebCamCapture = () => {
     setErrorMessage(""); // clear the error when close the modal
   };
 
-  const closeErrorModal = () => {
-    // when the close error modal button is clicked
+  const closeErrorModal = () => { // when the close error modal button is clicked
     setShowErrorModal(false);
     setErrorMessage(""); // clear the error when close the error modal
   };
@@ -205,8 +147,7 @@ const WebCamCapture = () => {
     }
   }, []);
 
-  useEffect(() => {
-    // set the showErrorModal variable when the showModal or errorMessage button is clicked
+  useEffect(() => { // set the showErrorModal variable when the showModal or errorMessage button is clicked
     if (errorMessage !== "" && showModal) {
       setShowErrorModal(true);
     }
@@ -296,30 +237,19 @@ const WebCamCapture = () => {
               />
             </div>
           )}
-          <div style={{ position: "relative", marginTop: "20px" }}>
+          <div style={{ position: 'relative', marginTop: '20px' }}>
             <video
               ref={webcamRef}
               autoPlay
               playsInline
-              style={{ width: "100%", maxHeight: "400px" }}
+              style={{ width: '100%', maxHeight: '400px'}}
             />
             {/* Overlay circle with green border */}
-            <div
-              className="overlay-circle"
-              style={{
-                border: `5px solid ${tagDisabled ? "green" : "red"}`,
-                backgroundColor: tagDisabled
-                  ? "rgba(0, 0, 0, 0)"
-                  : "rgba(0, 0, 0, 0.2)",
-              }}
-            >
-              {tagDisabled ? (
-                ""
-              ) : (
-                <div className="overlay-text">
-                  Move closer until the object fits within the circle
-                </div>
-              )}
+            <div className="overlay-circle" style={{ 
+              border: `5px solid ${tagDisabled ? "green" : "red"}`,
+              backgroundColor: tagDisabled ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.2)"
+            }}>
+              {tagDisabled ? "" : <div className='overlay-text'>Move closer until the object fits within the circle</div>}
             </div>
           </div>
         </Modal.Body>
@@ -342,76 +272,16 @@ const WebCamCapture = () => {
         </Modal.Body>
       </Modal>
 
-      <Modal
-        show={showGetWheelID}
-        onHide={() => setShowGetWheelID(false)}
-        size="lg"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Get Wheel ID</Modal.Title>
-        </Modal.Header>
-        {permissionGranted && !showModal && (
-          <div className="mt-3">
-            {/* Capture Image Button */}
-            {showGetWheelID && (
-              <>
-                <Button onClick={capture} className="ms-2">
-                  Capture Image
-                </Button>
-                {/* Upload Image Button */}
-                {capturedImage && (
-                  <Button onClick={handleCapture} className="ms-2">
-                    Upload Image
-                  </Button>
-                )}
-              </>
-            )}
-
-            {/* Display the captured image */}
-            {capturedImage && (
-              <div className="my-3">
-                <p className="h5 ms-4">Captured Image:</p>
-                <img
-                  src={capturedImage}
-                  alt="Captured"
-                  style={{
-                    width: "100%",
-                    maxHeight: "400px",
-                    marginBottom: "20px",
-                    objectFit: "contain",
-                  }}
-                />
-              </div>
-            )}
-            <div style={{ position: "relative", marginTop: "20px" }}>
-              <video
-                ref={webcamRef}
-                autoPlay
-                playsInline
-                style={{ width: "100%", maxHeight: "400px" }}
-              />
-              {/* Overlay circle with green border */}
-              <div
-                className="overlay-circle"
-                style={{
-                  border: `5px solid ${tagDisabled ? "green" : "red"}`,
-                  backgroundColor: tagDisabled
-                    ? "rgba(0, 0, 0, 0)"
-                    : "rgba(0, 0, 0, 0.2)",
-                }}
-              >
-                {tagDisabled ? (
-                  ""
-                ) : (
-                  <div className="overlay-text">
-                    Move closer until the object fits within the circle
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </Modal>
+      {permissionGranted && !showModal && (
+        <div className="mt-3">
+          <video
+            ref={webcamRef}
+            autoPlay
+            playsInline
+            style={{ width: "100%", maxHeight: "400px" }}
+          />
+        </div>
+      )}
     </Container>
   );
 };
