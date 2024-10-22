@@ -20,6 +20,7 @@ const WebCamCapture = () => {
   const [showErrorModal, setShowErrorModal] = useState(false); // for error modal
   const [capturedImage, setCapturedImage] = useState(null);
   const [showGetWheelID, setShowGetWheelID] = useState(false);
+  const [isStopped, setIsStopped] = useState(false);
 
   const tagChange = (event) => {
     setTagValue(event.target.value);
@@ -129,8 +130,14 @@ const WebCamCapture = () => {
         }
       };
 
+      if (isStopped) {
+        setRecordedChunks([]);
+      }
+
       mediaRecorder.start();
       setRecording(true);
+      setIsStopped(false);
+
       setTimeout(() => {
         stopRecording();
       }, 10000); // set the limit of recording video: 10000 = 10s
@@ -143,6 +150,7 @@ const WebCamCapture = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setRecording(false);
+      setIsStopped(true);
     }
   };
 
